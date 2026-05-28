@@ -1,91 +1,166 @@
 # VisionGuard-AI
 
-VisionGuard-AI is a production-oriented AI CCTV surveillance platform scaffold with:
+VisionGuard-AI is a smart CCTV app.
+It has:
+- **Backend** (API server)
+- **Frontend** (web dashboard)
+- **Docker option** (run everything together)
 
-- FastAPI backend with JWT + RBAC (Super Admin, Security Officer, Viewer)
-- Camera onboarding and diagnostics APIs
-- Threat event APIs and websocket telemetry
-- Next.js + Tailwind dashboard skeleton (camera grid + analytics + event feed)
-- PostgreSQL + Redis integration points
-- Dockerfiles + Docker Compose deployment
-- Beginner-focused docs for installation, troubleshooting, GPU, and camera setup
+---
 
-## Project Structure
+## Super Simple Setup (Copy + Paste)
 
-```text
-visionguard-ai/
-├── backend/
-├── frontend/
-├── ai_models/
-├── camera_services/
-├── streaming_engine/
-├── detection_engines/
-├── alerts/
-├── recordings/
-├── database/
-├── docker/
-├── deployment/
-├── scripts/
-├── docs/
-├── tests/
-├── configs/
-└── README.md
+## Option A (Easiest): Run with Docker
+
+### 1) Install Docker Desktop
+- Download: https://www.docker.com/products/docker-desktop/
+- Open Docker Desktop and keep it running.
+
+### 2) Run the project
+```bash
+cd /tmp/workspace/ibrahimkhalilmasud/visionguard-ai/docker
+docker compose up --build
 ```
 
-## Folder Guide
+### 3) Open the app
+- Frontend: `http://localhost:3000`
+- Backend API docs: `http://localhost:8000/docs`
 
-- `backend/`: FastAPI APIs, auth/RBAC, camera/event services, websocket telemetry, SQLAlchemy models.
-- `frontend/`: Next.js + Tailwind dashboard (live grid, event panel, analytics panel).
-- `ai_models/`: YOLO/FaceNet model weights and TensorRT artifacts.
-- `camera_services/`: Vendor-specific camera adapters (RTSP/ONVIF/Xiaomi/Imou/Dahua/etc.).
-- `streaming_engine/`: FFmpeg/GStreamer stream and transcode pipeline integrations.
-- `detection_engines/`: Threat-detection pipelines (human, fire, smoke, weapon, intrusion).
-- `alerts/`: Alert templates and delivery payload structures.
-- `recordings/`: Event and continuous recordings (MP4/H264/H265), plus lifecycle cleanup.
-- `database/`: DB migrations, seed files, backup/restore scripts.
-- `docker/`: Backend/frontend Dockerfiles and Docker Compose stack.
-- `deployment/`: Windows/Ubuntu deployment manifests and service configs.
-- `scripts/`: Bootstrap scripts for local machine setup.
-- `docs/`: Installation, beginner guide, API docs, GPU guide, camera guide, troubleshooting.
-- `tests/`: Cross-service and integration test assets.
-- `configs/`: Environment examples and runtime configuration templates.
+If Docker fails, use **Option B** below.
 
-## Quick Start (Local)
+---
 
-### Backend
+## Option B: Run Backend + Frontend Manually
+
+## What you need first
+Install these:
+- Python 3.11+
+- Node.js 18+
+- Git
+
+Check versions:
 ```bash
-cd backend
+python --version
+node --version
+git --version
+```
+
+---
+
+## Step 1) Start Backend
+
+```bash
+cd /tmp/workspace/ibrahimkhalilmasud/visionguard-ai/backend
 python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### Frontend
+Windows activation command (use this instead of `source`):
+```powershell
+.venv\Scripts\activate
+```
+
+When backend is running, open: `http://localhost:8000/docs`
+
+---
+
+## Step 2) Start Frontend (new terminal)
+
 ```bash
-cd frontend
+cd /tmp/workspace/ibrahimkhalilmasud/visionguard-ai/frontend
 npm install
 npm run dev
 ```
 
-### Docker
+Open: `http://localhost:3000`
+
+---
+
+## First Time Use
+1. Open backend docs: `http://localhost:8000/docs`
+2. Register/login
+3. Add camera with `/api/v1/cameras`
+4. Open dashboard at `http://localhost:3000`
+
+---
+
+## If Something Breaks (Quick Fixes)
+
+## 1) `python: command not found`
+Try:
 ```bash
-cd docker
+python3 --version
+```
+Then replace `python` with `python3` in commands.
+
+On Windows, you can also try:
+```powershell
+py --version
+```
+
+## 2) `pip: command not found`
+Use:
+```bash
+python -m pip install -r requirements.txt
+```
+
+## 3) Virtual environment activation fails
+- Linux/macOS:
+```bash
+source .venv/bin/activate
+```
+- Windows PowerShell:
+```powershell
+.venv\Scripts\activate
+```
+If PowerShell blocks scripts:
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+Then activate again.
+
+## 4) Port already in use (`8000` or `3000`)
+Use different ports:
+- Backend:
+```bash
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
+```
+- Frontend:
+```bash
+npm run dev -- -p 3001
+```
+
+## 5) `ModuleNotFoundError` in backend
+Inside backend folder, with venv active:
+```bash
+python -m pip install -r requirements.txt
+```
+
+## 6) `npm install` fails
+Try:
+```bash
+npm cache clean --force
+npm install --legacy-peer-deps
+```
+
+## 7) Still stuck?
+Use Docker option:
+```bash
+cd /tmp/workspace/ibrahimkhalilmasud/visionguard-ai/docker
 docker compose up --build
 ```
 
-## Core Environment Variables
+---
 
-- `APP_NAME`: Display name used by backend service.
-- `API_PREFIX`: API base path (default `/api/v1`).
-- `SECRET_KEY`: JWT signing key (must be replaced in production).
-- `JWT_ALGORITHM`: JWT algorithm (default `HS256`).
-- `ACCESS_TOKEN_MINUTES`: Access token expiry in minutes.
-- `DATABASE_URL`: SQLAlchemy database connection string.
-- `REDIS_URL`: Redis connection string for caching/queue extensions.
+## Project Folders (Quick Map)
+- `backend/` → API server
+- `frontend/` → Dashboard UI
+- `docker/` → Docker setup
+- `docs/` → Extra guides
 
-## Documentation
-
+Extra docs:
 - `/docs/installation-guide.md`
 - `/docs/beginner-setup-guide.md`
 - `/docs/troubleshooting-guide.md`
